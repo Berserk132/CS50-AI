@@ -112,15 +112,18 @@ while True:
         if user != player and not game_over:
             if ai_turn:
                 time.sleep(0.5)
+                print(board)
                 move = ttt.minimax(board)
                 board = ttt.result(board, move)
                 ai_turn = False
             else:
                 ai_turn = True
 
+
         # Check for a user move
         click, _, _ = pygame.mouse.get_pressed()
         if click == 1 and user == player and not game_over:
+            print(f"i'm here")
             mouse = pygame.mouse.get_pos()
             for i in range(3):
                 for j in range(3):

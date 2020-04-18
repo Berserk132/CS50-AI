@@ -3,10 +3,15 @@ Tic Tac Toe Player
 """
 
 import math
+import copy
 
 X = "X"
 O = "O"
 EMPTY = None
+
+globalList = []
+globalActions = []
+tmpList = []
 
 
 def initial_state():
@@ -22,46 +27,185 @@ def player(board):
     """
     Returns player who has the next turn on a board.
     """
-    raise NotImplementedError
+
+    xNum = 0
+    yNum = 0
+
+    for i in range(len(board)):
+
+        for j in range(len(board[i])):
+
+            if board[i][j] == "X":
+                xNum += 1
+            elif board[i][j] == "O":
+                yNum += 1
+
+    if xNum < yNum:
+        return X
+    elif yNum < xNum:
+        return O
+    else:
+        return X
 
 
 def actions(board):
     """
     Returns set of all possible actions (i, j) available on the board.
     """
-    raise NotImplementedError
+    availActions = set()
+
+    for i in range(len(board)):
+
+        for j in range(len(board[i])):
+
+            if board[i][j] == EMPTY:
+                availActions.add((i, j))
+
+    return availActions
 
 
 def result(board, action):
     """
     Returns the board that results from making move (i, j) on the board.
     """
-    raise NotImplementedError
+    boardCopy = copy.copy(board)
+
+    playerTurn = player(board)
+
+    boardCopy[action[0]][action[1]] = playerTurn
+
+    return boardCopy
 
 
 def winner(board):
     """
     Returns the winner of the game, if there is one.
     """
-    raise NotImplementedError
+    for i in range(len(board)):
+
+        if board[i][0] == "X" and board[i][1] == "X" and board[i][2] == "X":
+            return X
+        elif board[i][0] == "O" and board[i][1] == "O" and board[i][2] == "O":
+            return O
+        elif board[0][i] == "O" and board[1][i] == "O" and board[2][i] == "O":
+            return O
+        elif board[0][i] == "X" and board[1][i] == "X" and board[2][i] == "X":
+            return X
+
+    if board[0][0] == "O" and board[1][1] == "O" and board[2][2] == "O":
+        return O
+    elif board[0][0] == "X" and board[1][1] == "X" and board[2][2] == "X":
+        return X
+    elif board[0][2] == "X" and board[1][1] == "X" and board[2][0] == "X":
+        return X
+    elif board[0][2] == "O" and board[1][1] == "O" and board[2][0] == "O":
+        return O
+    else:
+        return None
 
 
 def terminal(board):
     """
     Returns True if game is over, False otherwise.
     """
-    raise NotImplementedError
+    if winner(board) is not None:
+        return True
+
+    for row in board:
+        for cell in row:
+            if cell == EMPTY:
+                return False
+
+    return True
 
 
 def utility(board):
     """
     Returns 1 if X has won the game, -1 if O has won, 0 otherwise.
     """
-    raise NotImplementedError
+    win = winner(board)
+
+    if win == "X":
+        return 1
+    elif win == "O":
+        return -1
+    else:
+        return 0
 
 
 def minimax(board):
     """
     Returns the optimal action for the current player on the board.
     """
-    raise NotImplementedError
+    availActions = list(actions(board=board))
+
+    valuesList = []
+    valueActions = []
+
+    tmpBoard = copy.deepcopy(board)
+
+    getMaxVal(tmpBoard)
+    valuesList.append(min(globalList))
+    indexTmp = getMin(globalList)
+
+
+
+    if len(globalActions) > 0:
+        valueActions.append(globalActions[indexTmp])
+
+    print(valuesList)
+    print(valueActions)
+
+    globalList.clear()
+
+    globalActions.clear()
+
+    return valueActions[0]
+
+
+def getMin(arr):
+    minimum = 19198
+    for i in range(len(arr)):
+        if arr[i] < minimum:
+            minimum = arr[i]
+            index = i
+    return index
+
+
+
+def getMaxVal(board):
+
+    if terminal(board):
+        res = utility(board)
+        globalList.append(res)
+        globalActions.append(tmpList[0])
+        tmpList.clear()
+        return res
+
+
+    availActions = list(actions(board=board))
+    for action in availActions:
+        tmpList.append(action)
+        newBoard = copy.deepcopy(board)
+        newBoard = result(newBoard, action)
+
+        getMaxVal(newBoard)
+
+
+
+
+if __name__ == "__main__":
+    board = initial_state()
+
+    # print(player(board=board))
+
+    availActions = list(actions(board=board))
+
+    # for (i, j) in availActions:
+    # print(f"{i} : {j}")
+
+    # print(result(board, availActions[2]))
+
+    # print(terminal(board))
+
+    minimax(board)
