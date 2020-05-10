@@ -9,7 +9,7 @@ X = "X"
 O = "O"
 EMPTY = None
 
-globalList = []
+globalList = set()
 globalActions = []
 tmpList = []
 
@@ -21,6 +21,15 @@ def initial_state():
     return [[EMPTY, EMPTY, EMPTY],
             [EMPTY, EMPTY, EMPTY],
             [EMPTY, EMPTY, EMPTY]]
+
+
+'''def initial_state():
+    """
+    Returns starting state of the board.
+    """
+    return [[EMPTY, EMPTY, EMPTY],
+            [EMPTY, EMPTY, EMPTY],
+            [EMPTY, EMPTY, EMPTY]]'''
 
 
 def player(board):
@@ -142,25 +151,25 @@ def minimax(board):
     valuesList = []
     valueActions = []
 
-    tmpBoard = copy.deepcopy(board)
+    for action in availActions:
+        tmpBoard = copy.deepcopy(board)
+        valueActions.append(action)
+        getMaxVal(result(tmpBoard, action))
+        print(globalList)
+        # i want the minimum solution
+        tmp = list(globalList)
+        valuesList.append(max(tmp))
+        # i need the index of minimum val
 
-    getMaxVal(tmpBoard)
-    valuesList.append(min(globalList))
-    indexTmp = getMin(globalList)
-
-
-
-    if len(globalActions) > 0:
-        valueActions.append(globalActions[indexTmp])
+        #clear the lists
+        globalList.clear()
+        globalActions.clear()
+    minIndex = getMin(valuesList)
 
     print(valuesList)
     print(valueActions)
-
-    globalList.clear()
-
-    globalActions.clear()
-
-    return valueActions[0]
+    print(minIndex)
+    return valueActions[minIndex]
 
 
 def getMin(arr):
@@ -172,26 +181,19 @@ def getMin(arr):
     return index
 
 
-
 def getMaxVal(board):
-
     if terminal(board):
         res = utility(board)
-        globalList.append(res)
-        globalActions.append(tmpList[0])
-        tmpList.clear()
+        print (res)
+        globalList.add(res)
         return res
-
 
     availActions = list(actions(board=board))
     for action in availActions:
-        tmpList.append(action)
         newBoard = copy.deepcopy(board)
         newBoard = result(newBoard, action)
 
         getMaxVal(newBoard)
-
-
 
 
 if __name__ == "__main__":
